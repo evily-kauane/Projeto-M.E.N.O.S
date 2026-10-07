@@ -1,6 +1,8 @@
 package com.example.M.E.N.O.S.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -11,8 +13,13 @@ public class Produto implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "O nome do produto é obrigatório")
     private String nome;
+
     private LocalDate validade;
+
+    @PositiveOrZero(message = "A quantidade não pode ser negativa")
     private int quantidade;
 
     public Produto(){
@@ -53,7 +60,9 @@ public class Produto implements Serializable {
         return quantidade;
     }
 
-    public void setQuantidade(int quantidadeDisponivel) {
+    // CORRIGIDO: antes o parâmetro era "quantidadeDisponivel" e o código fazia
+    // this.quantidade = quantidade, ou seja, o valor nunca era gravado.
+    public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
 

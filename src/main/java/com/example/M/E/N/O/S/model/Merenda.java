@@ -1,9 +1,11 @@
 package com.example.M.E.N.O.S.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -12,12 +14,24 @@ public class Merenda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "O nome da merenda é obrigatório")
     private String nome;
 
+    // A imagem não vai no JSON (ficaria pesada nas listagens);
+    // ela é enviada/baixada pelos endpoints /merendas/{id}/imagem.
+    @JsonIgnore
     @Lob
     private byte[] imagem;
+
+    @JsonIgnore
+    private String imagemTipo;
+
+    @PositiveOrZero(message = "A quantidade não pode ser negativa")
     private int quantidade;
 
+    // @JsonIgnore evita loop infinito no JSON (Merenda -> Menu -> Merenda -> ...)
+    @JsonIgnore
     @ManyToMany(mappedBy = "merendas")
     private List<Menu> menus = new ArrayList<>();
 
@@ -56,6 +70,14 @@ public class Merenda {
         this.imagem = imagem;
     }
 
+    public String getImagemTipo() {
+        return imagemTipo;
+    }
+
+    public void setImagemTipo(String imagemTipo) {
+        this.imagemTipo = imagemTipo;
+    }
+
     public int getQuantidade() {
         return quantidade;
     }
@@ -72,14 +94,14 @@ public class Merenda {
         this.menus = menus;
     }
 
+    // toString sem "menus" e sem "imagem" para não gerar StackOverflowError
+    // (Menu também imprime as merendas) nem imprimir o array de bytes inteiro.
     @Override
     public String toString() {
         return "Merenda{" +
                 "id=" + id +
                 ", nome='" + nome + '\'' +
-                ", imagem=" + Arrays.toString(imagem) +
                 ", quantidade=" + quantidade +
-                ", menus=" + menus +
                 '}';
     }
 }
